@@ -89,7 +89,9 @@ We've probably got you covered. Let's take a look at the optional arguments for
   
   # Do you want to be able to click on rows to expand them and show hidden
   #   content?†
-  full_row_select: '
+  # If so, point us to the partial you would like to render in the detail row.
+  # This will be whatever you'd pass to `render partial: ...`
+  full_row_select_partial: nil,
 }
 ```
 
