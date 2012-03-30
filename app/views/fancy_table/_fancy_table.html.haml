@@ -1,6 +1,6 @@
 :ruby
   group_actions ||= []
-  member_actions ||= []
+  member_actions ||= {}
   actions ||= {}
   update_multiple_controller ||= controller.controller_name
 
@@ -35,11 +35,13 @@
         = link_to name, path, :class => 'button'
       - if show_rows_per_page
         %form
-          %input{ :type => 'hidden', :name => 'order_by', :value => params[:order_by] }
+          %input{ type: 'hidden', name: 'order_by', value: params[:order_by] }
           %select{ :name => 'rows_per_page' }
             - [10, 25, 50, 'All'].each do |item|
-              :erb
-                <option value="<%= item %>"<%= item.to_s == params[:rows_per_page] ? ' selected="selected" ' : '' %>><%= item %></option>
+              :ruby
+                params = { value: item }
+                params[:selected] = selected if item.to_s == params[:rows_per_page]
+              %option{ params }= item
           %input{ :type => 'submit', :value => 'Go' }
   - if objects.blank?
     #section{ :style => 'padding:2em'}
@@ -51,12 +53,20 @@
       { :method => :put } do
       - unless group_actions.empty?
         %div
-          %input{ :type => 'hidden', :name => 'order_by', :value => params[:order_by] }
-          %input{ :type => 'hidden', :name => 'rows_per_page', :value => params[:rows_per_page] }
-          %input{ :type => 'hidden', :name => 'page', :value => params[:page] }
-      %table.actual_table#projects-table
+          %w(order_by rows_per_page page).each do |param|
+            %input{ type: 'hidden', value: param, name: params[param.to_sym] }
+      %table.fancy_table
+        %caption
+          %h2= title
+          - if actions.present?
+            .controls
+              - actions.each do |text, target|
+                = link_to text, target
+              - if show_rows_per_page
+                %form
+                  %input{ type: 'hidden', name: 'order_by', value: params[:order_by] }
         %tr
-          - unless group_actions.empty?
+          - if group_actions.present?
             %th
           - orders.each do |field, name|
             %th
@@ -71,7 +81,7 @@
             %th
         - objects.each do |object|
           %tr
-            - unless group_actions.empty?
+            - if group_actions.present?
               %td= check_box_tag "#{object.class.table_name.singularize}_ids[]", object.id
             - orders.each do |field, name|
               %td
@@ -113,4 +123,4 @@
               = paginate forkaminari
             %section#actions
               - group_actions.each do |action|
-                = submit_tag action.titleize, :id => "#{action}_button"
+                = submit_tag action, :id => "#{action}_button"
