@@ -11,6 +11,9 @@ What's going on here?
 fancy_table allows you to easily create tables which are semantic HTML5, are
 easy to style, and are beautiful.
 
+The killer feature is probably sorting on the server-side (_read: vroom!_).
+This is done by clicking on headers and uses SmartOrder (see below).
+
 If it's so easy, how do I do it?
 --------------------------------
 
@@ -115,10 +118,60 @@ end
 
 ###<sup>†</sup> Full Row Select
 
-Using calebthompson's [full-row-select](https://calebthompson/full-row-select)
+Using [calebthompson](https://github.com/calebthompson)'s
+[full-row-select](https://github.com/calebthompson/full-row-select) (which
+you'll have to download and install seperately), we can allow users to click on
+a row in the fancy_table and have it expand to show a detail row.
 
-Smart Order
------------
+Demos are often better than words, so go over
+[here](http://www.jankoatwarpspeed.com/examples/expandable-rows/)
+if you don't understand.
+
+I don't like how it looks.
+--------------------------
+
+Sticks and stones, friend.
+
+While we've included styles for fancy_table, we encourage you to roll your own
+that match your site. It will probably turn out better for you in the long run
+if you design your own look‐and‐feel.
+
+SmartOrder
+----------
+
+The heavy lifting of sorting fancy_tables is done server-side in the model.
+To accomplish this, we include the SmartOrder module in our models.
+
+You have a couple of options here. If you plan to use fancy_table extensively
+through your application, you can include SmartOrder in ActiveRecord::Base in
+an initializer:
+
+```ruby
+class ActiveRecord::Base
+  include SmartOrder::Sortable
+end
+```
+
+If you are only going to use fancy_table in one or two places—or if you don't
+like the idea of extending Rails core classes, you can include it in specific
+models as well:
+
+```ruby
+class Book < ActiveRecord::Base
+  include SmartOrder::Sortable
+  # The rest of your model code
+end
+```
+
+We plan to pull smart_order out into its own gem down the road, but we were more
+excited about fancy_table so we started here.
+
+Our own dog food
+----------------
+
+We use fancy_table extensively in our solar project finance platform,
+[SolMarket](http://solmarket.com), and plan to use it in the Rails rewrite of
+our other site, [SolSystems](http://solsystemscompany.com).
 
 We love you...
 --------------
