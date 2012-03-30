@@ -27,58 +27,68 @@
     member_actions = member_actions.map_hash { |action| [ action, action ] }
   end
 
-%section.module.fancy_table
-  %header
-    %h2= title
-    .controls
-      - actions.each do |name, path|
-        = link_to name, path, :class => 'button'
-      - if show_rows_per_page
-        %form
-          %input{ type: 'hidden', name: 'order_by', value: params[:order_by] }
-          %select{ :name => 'rows_per_page' }
-            - [10, 25, 50, 'All'].each do |item|
-              :ruby
-                params = { value: item }
-                params[:selected] = selected if item.to_s == params[:rows_per_page]
-              %option{ params }= item
-          %input{ :type => 'submit', :value => 'Go' }
-  - if objects.blank?
-    #section{ :style => 'padding:2em'}
-      %p No Results
-  - else
-    = wrap_unless group_actions.empty?, :form_tag,
-      { :controller => update_multiple_controller,
-        :action => :update_multiple},
-      { :method => :put } do
-      - unless group_actions.empty?
-        %div
-          %w(order_by rows_per_page page).each do |param|
-            %input{ type: 'hidden', value: param, name: params[param.to_sym] }
-      %table.fancy_table
-        %caption
-          %h2= title
-          - if actions.present?
-            .controls
-              - actions.each do |text, target|
-                = link_to text, target
-              - if show_rows_per_page
-                %form
-                  %input{ type: 'hidden', name: 'order_by', value: params[:order_by] }
+  column_count = orders.count
+  column_count += 1 if group_actions.present?
+  column_count += 1 if member_actions.present?
+
+= wrap_if group_actions.present?, :form_tag,
+  { controller: update_multiple_controller,
+    action: :update_multiple },
+  { method: :put } do
+  - if group_actions.present?
+    %div
+      - %w(order_by rows_per_page page).each do |param|
+        %input{ type: 'hidden', value: param, name: params[param.to_sym] }
+  %table.fancy_table
+    %caption
+      %h2= title
+      - if actions.present?
+        .controls
+          - actions.each do |text, target|
+            = link_to text, target
+          - if show_rows_per_page
+            %form
+              %input{ type: 'hidden', name: 'order_by', value: params[:order_by] }
+              %select{ name: 'rows_per_page' }
+                - rows_per_page_options.each do |row_count|
+                  :ruby
+                    params = { value: row_count }
+                    params[:selected] = selected if row_count.to_s == params[:rows_per_page]
+                  %option{ params }= row_count
+              %input{ type: 'submit', value: 'Go' }
+    - if objects.blank?
+      %tbody
         %tr
-          - if group_actions.present?
-            %th
-          - orders.each do |field, name|
-            %th
-              :ruby
-                order = "#{field}#{( sort_col == field and sort_desc ) ? '' : ' desc'}"
-                url = url_for :rows_per_page => params[:rows_per_page], :order_by => order
-                if sort_col == field
-                  name += ' ' + ( sort_desc ? '▼' : '▲' )
-                end
-              = link_to name.titleize, url, :class => sort_col == field ? 'current' : nil
-          - unless member_actions.empty?
-            %th
+          %td
+            %p.no-results No Results
+    - else
+      %thead
+        - if group_actions.present? # Empty header column for checkboxes
+          %th
+        - headers.each do |field, name|
+          %th
+            :ruby
+              # Determine the sort order and add order indicators if this is the
+              # header by which the objects are currently sorted.
+              order =
+                "#{field}#{( sort_col == field and sort_desc ) ? '' : ' desc'}"
+              url =
+                url_for rows_per_page: params[:rows_per_page], order_by: order
+              name += ' ' + ( sort_desc ? '▼' : '▲' ) if (sort_col == field)
+        - if member_actions.present? # Empty header column for member_actions
+          %th
+      - if group_actions.present? || forkaminari.respond_to?(:num_pages) || forkaminari.num_pages == 1
+        - if forkaminari.respond_to?(:current_page) || group_actions.any?
+          %tfoot
+            - if forkaminari.respond_to? :current_page
+              %tr
+                %td{ colspan: column_count }= paginate forkaminari
+            - if group_actions.any?
+              %tr#actions
+                %td{ colspan: column_count }
+                  - group_actions.each do |action|
+                    = submit_tag action, id: "#{ action.underscore }_button"
+      %tbody
         - objects.each do |object|
           %tr
             - if group_actions.present?
@@ -88,7 +98,10 @@
                 - if (field.to_s == object.class.default_order_column and (link = object.to_s))
                   = link
                 - else
+
                   :ruby
+                    #field = field.to_s # allow symbols
+                    # handle calling methods on fields
                     fields = field.split('.')
                     puts fields.inject(object) { |memo, field|
                       if memo.nil?
@@ -99,7 +112,12 @@
                           if c.nil?
                             nil
                           else
-                            "#{c.class.table_name.classify}Decorator".constantize.decorate c
+                            decorator = "#{c.class.table_name.classify}Decorator"
+                            if const_defined? decorator
+                              decorator.constantize.decorate c
+                            else
+                              c
+                            end
                           end
                         else
                           memo.send(field)
@@ -114,13 +132,4 @@
                   - else
                     - klass = object.class.table_name.singularize
                     - href = send( "#{action}_#{klass}_path", object )
-
                   = link_to text, href
-      - unless group_actions.empty? and forkaminari.respond_to?(:num_pages) and forkaminari.num_pages == 1
-        - if forkaminari.respond_to? :current_page or group_actions.any?
-          %footer
-            -if forkaminari.respond_to? :current_page
-              = paginate forkaminari
-            %section#actions
-              - group_actions.each do |action|
-                = submit_tag action, :id => "#{action}_button"
