@@ -5,11 +5,11 @@ require "fancy_table/version"
 Gem::Specification.new do |s|
   s.name        = "fancy_table"
   s.version     = FancyTable::VERSION
-  s.authors     = ["Caleb Thompson"]
-  s.email       = ["caleb@solsystemscompany.com"]
+  s.authors     = ["Caleb Thompson", "Ram Dobson", "Sol Systems"]
+  s.email       = ["cjaysson@gmail.com", "fringd@gmail.com", "gems@solsystemscompany.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Tables. Done right.}
+  s.description = %q{Create fancy tables which are semantic HTML5, are easy to style, and are beautiful.}
 
   s.rubyforge_project = "fancy_table"
 
