@@ -1,0 +1,116 @@
+:ruby
+  group_actions ||= []
+  member_actions ||= []
+  actions ||= {}
+  update_multiple_controller ||= controller.controller_name
+
+  forkaminari ||= nil
+  if forkaminari.nil?
+    if objects.is_a? Draper::DecoratedEnumerableProxy
+      forkaminari = objects.instance_variable_get(:@wrapped_collection)
+    else
+      forkaminari = objects
+    end
+  end
+  objects = objects.to_a #only do sql once
+
+  params[:order_by] =~ /\A([^\s]+)(\s*desc)?\Z/
+  sort_col  = $1
+  sort_desc = !$2.blank?
+
+  # note that defined? won't work yet on show_rows_per_page because we're
+  # defining it here when it isn't defined.
+  show_rows_per_page = objects.size >= 10 if show_rows_per_page.nil?
+
+  # note that we're assuming that member_actions is going to be a hash otherwise
+  if member_actions.is_a? Array
+    member_actions = member_actions.map_hash { |action| [ action, action ] }
+  end
+
+%section.module.fancy_table
+  %header
+    %h2= title
+    .controls
+      - actions.each do |name, path|
+        = link_to name, path, :class => 'button'
+      - if show_rows_per_page
+        %form
+          %input{ :type => 'hidden', :name => 'order_by', :value => params[:order_by] }
+          %select{ :name => 'rows_per_page' }
+            - [10, 25, 50, 'All'].each do |item|
+              :erb
+                <option value="<%= item %>"<%= item.to_s == params[:rows_per_page] ? ' selected="selected" ' : '' %>><%= item %></option>
+          %input{ :type => 'submit', :value => 'Go' }
+  - if objects.blank?
+    #section{ :style => 'padding:2em'}
+      %p No Results
+  - else
+    = wrap_unless group_actions.empty?, :form_tag,
+      { :controller => update_multiple_controller,
+        :action => :update_multiple},
+      { :method => :put } do
+      - unless group_actions.empty?
+        %div
+          %input{ :type => 'hidden', :name => 'order_by', :value => params[:order_by] }
+          %input{ :type => 'hidden', :name => 'rows_per_page', :value => params[:rows_per_page] }
+          %input{ :type => 'hidden', :name => 'page', :value => params[:page] }
+      %table.actual_table#projects-table
+        %tr
+          - unless group_actions.empty?
+            %th
+          - orders.each do |field, name|
+            %th
+              :ruby
+                order = "#{field}#{( sort_col == field and sort_desc ) ? '' : ' desc'}"
+                url = url_for :rows_per_page => params[:rows_per_page], :order_by => order
+                if sort_col == field
+                  name += ' ' + ( sort_desc ? '▼' : '▲' )
+                end
+              = link_to name.titleize, url, :class => sort_col == field ? 'current' : nil
+          - unless member_actions.empty?
+            %th
+        - objects.each do |object|
+          %tr
+            - unless group_actions.empty?
+              %td= check_box_tag "#{object.class.table_name.singularize}_ids[]", object.id
+            - orders.each do |field, name|
+              %td
+                - if (field.to_s == object.class.default_order_column and (link = object.to_s))
+                  = link
+                - else
+                  :ruby
+                    fields = field.split('.')
+                    puts fields.inject(object) { |memo, field|
+                      if memo.nil?
+                        nil
+                      else
+                        if field.match /^(.*)=(.*)$/
+                          c = memo.where( $1 => $2 ).first
+                          if c.nil?
+                            nil
+                          else
+                            "#{c.class.table_name.classify}Decorator".constantize.decorate c
+                          end
+                        else
+                          memo.send(field)
+                        end
+                      end
+                    }
+            - unless member_actions.blank?
+              %td
+                - member_actions.each do |text, action|
+                  - if action.is_a? Proc
+                    - href = action.call( object )
+                  - else
+                    - klass = object.class.table_name.singularize
+                    - href = send( "#{action}_#{klass}_path", object )
+
+                  = link_to text, href
+      - unless group_actions.empty? and forkaminari.respond_to?(:num_pages) and forkaminari.num_pages == 1
+        - if forkaminari.respond_to? :current_page or group_actions.any?
+          %footer
+            -if forkaminari.respond_to? :current_page
+              = paginate forkaminari
+            %section#actions
+              - group_actions.each do |action|
+                = submit_tag action.titleize, :id => "#{action}_button"
