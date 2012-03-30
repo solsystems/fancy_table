@@ -181,8 +181,9 @@ We love you...
 ...and want you to be happy.
 
 If you have any problems with fancy_table, please
-[open an issue](https://github.com/solsystems/fancy_table/issues/new) and we'll
-see if we can help out.
+[open an issue](https://github.com/calebthompson/fancy_table/issues/new) and
+we'll see if we can help out.
 
 We'd love you more even more if you forked fancy_table and
-[opened a pull request](https://github.com/solsystems/pull/new) instead.
+[opened a pull request](https://github.com/calebthompson/fancy_table/pull/new)
+instead.
