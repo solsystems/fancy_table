@@ -118,7 +118,7 @@
                     # handle calling methods on fields
                     fields = field.split('.')
                     value = fields.inject(object) { |memo, field|
-                      if memo.nil?
+                      if memo.nil?#
                         nil
                       else
                         if field.match /^(.*)=(.*)$/
@@ -159,7 +159,7 @@
               %tr
                 %td{ colspan: column_count }= paginate forkaminari
             - if group_actions.any?
-              %tr#actions
+              %tr.actions
                 %td{ colspan: column_count }
                   - group_actions.each do |action|
                     = submit_tag action, id: "#{ action.underscore }_button"
