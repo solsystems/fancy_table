@@ -1,3 +1,18 @@
+:coffeescript
+  (($) ->
+    $.fn.jExpand = ->
+      element = this
+      $(element).find("tbody tr:even").addClass("collapsed")
+      $(element).find("tbody tr:not(.collapsed)").hide()
+      $(element).find("tbody tr:first-child").show()
+      $(element).find("tbody tr.collapsed").click ->
+        $(this).toggleClass("uncollapsed")
+        $(this).next("tbody tr").toggle()
+      $(element).find("tbody tr a").click (e) -> e.stopPropagation()
+  )(jQuery)
+
+  $ ->
+    $('table.fancy_table.collapsible').jExpand()
 :ruby
   throw "objects is required" unless defined? objects
   klass = objects.first.class
@@ -47,7 +62,7 @@
     %div
       - %w(order_by rows_per_page page).each do |param|
         %input{ type: 'hidden', value: param, name: params[param.to_sym] }
-  %table.fancy_table
+  %table.fancy_table{class: ('collapsible' if collapsible)}
     %caption
       %h2= title
       - if actions.present?
@@ -135,7 +150,7 @@
                   = link_to text, href
           - if collapsible
             %tr
-              %td{:colspan => @headers.size}
+              %td{:colspan => headers.size}
                 = render object
       - if group_actions.present? || forkaminari.respond_to?(:num_pages) && forkaminari.num_pages != 1
         - if forkaminari.respond_to?(:current_page) || group_actions.any?

@@ -62,19 +62,15 @@ table.fancy_table {
       background-image:none;
     }
 
-    &.collapsed {
-      > td {
-        background-position: right center;
-        background-repeat: no-repeat;
-        &:last-child {
-          background-image: image-url('bg_darkrightarrow.png');
-          // Space for collapsed/uncollapsed arrow
-          padding-right: 2em;
-        }
-      }
-      &.uncollapsed > td:last-child {
-        background-image: image-url('bg_darkdroparrow.png');
-      }
+    &.collapsed > td:last-child:after {
+      content: '▶';
+      display: inline-block;
+      padding-left: 4px;
+    }
+    &.uncollapsed > td:last-child:after {
+      content: '▼';
+      display: inline-block;
+      padding-left: 4px;
     }
   }
   tfoot > tr {
