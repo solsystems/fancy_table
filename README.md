@@ -165,17 +165,6 @@ show_rows_per_page_select: false
 ```
 
 ### Full Row Select
-  
-  # Do you want to be able to click on rows to expand them and show hidden
-  #   content?†
-  # If so, point us to the partial you would like to render in the detail row.
-  # This will be whatever you'd pass to `render partial: ...`
-}
-```
-
-
-
-### Full Row Select
 
 Do you want to be able to click on rows to expand them and show hidden content?
 
