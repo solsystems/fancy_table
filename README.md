@@ -3,10 +3,17 @@ fancy_table
 
 Tables. Done right.
 
+BOOM!
+-----
+
+```erb
+<%= fancy_table @firefly_episodes %>
+```
+
 ![fancy_table of Firefly episodes](https://github.com/calebthompson/fancy_table/raw/master/firefly-episodes.png)
 
-What's going on here?
----------------------
+Okay, you've piqued my interest. What's going on here?
+-------------------------------------------
 
 fancy_table allows you to easily turn an ActiveRecord::Relation into a semantic
 HTML5 table which supports sorting, pagination, and links for actions to be
@@ -27,32 +34,22 @@ calls.
 
 ```ruby
 def index
-  @users = User.all
-  @headers = {
-    # This one's an instance method on User
-    full_name: 'Name',
-    # This one's a column on the User table
-    created_on: 'Since',
-    # Also a column. You can pass either a string or a symbol. We're not picky.
-    'age' => 'Age',
-    # This one's a method on a relation (User has_many :posts)
-    'posts.count' => 'Number of Posts',
-  }
+  @firefly_episodes = FireflyEpisode.scoped
+  @firefly_episodes = build_fancy_table @firefly_episodes
 end
 ```
 
 ### _Then in a view:_
 
 ```haml
-%section#user-index-page
-  = fancy_table 'All my Users', @users, @headers
+= fancy_table @firefly_episodes
 ```  
 
 What if I want to do...
 -----------------------
 
 We've probably got you covered. Let's take a look at the optional arguments for
-`build_fancy_table` and their default values.
+`build_fancy_table` in the controller, and their default values.
 
 ### actions
 
@@ -141,6 +138,11 @@ Sticks and stones, friend.
 While we've included styles for fancy_table, we encourage you to roll your own
 that match your site. It will probably turn out better for you in the long run
 if you design your own look‐and‐feel.
+
+We customized the styles for fancy_table for our own site. Here is what the
+previous table would look like for us:
+
+![fancy_table of Firefly episodes](https://github.com/calebthompson/fancy_table/raw/master/firefly-episodes.png)
 
 SmartOrder
 ----------
