@@ -8,10 +8,12 @@ Tables. Done right.
 What's going on here?
 ---------------------
 
-fancy_table allows you to easily create tables which are semantic HTML5, are
-easy to style, and are beautiful.
+fancy_table allows you to easily turn an ActiveRecord::Relation into a semantic
+HTML5 table which supports sorting, pagination, and links for actions to be
+posted back to the controller.
 
-The killer feature is probably sorting on the server-side (_read: vroom!_).
+Besides automagic generation of the table from the ActiveRecord::Relation, the
+killer feature is probably sorting on the server-side (_read: vroom!_).
 This is done by clicking on headers and uses SmartOrder (see below).
 
 If it's so easy, how do I do it?
@@ -52,50 +54,44 @@ What if I want to do...
 We've probably got you covered. Let's take a look at the optional arguments for
 `build_fancy_table` and their default values.
 
+### actions
+
+Actions appear in the fancy_table's `<caption>` as links. Actions are useful
+for things which do not relate to specific objects, such as creating a new
+entry.
+
+The format fairly simple:
+
 ```ruby
-{
-  # Actions appear in the fancy_table's caption as links.
-  # Format is { "Link text" => path }
-  # Useful for things like creating a new entry.
-  actions: {},
-
-  # Member Actions appear in the same row as the model.
-  # For simple actions, the format is { text => controller_action }
-  #   These will be rendered as "#{controller_action}_#{table_name}_path"
-  # For more complicated things, you can pass a block as the value.
-  # It should return a link.
-  # Useful for things like editing or destroying entries.
-  member_actions: {},
-
-  # Group Actions appear as links in the table's footer and cause fancy_table
-  #   to add checkboxes to each row.
-  # These are useful for bulk updates to entries.*
-  group_actions: [],
-
-  # This is the controller which will be used to perform group actions.*
-  update_multiple_controller: (controller.controller_name),
-
-  # What options would you like for the select box for how many rows should be
-  #   shown on each page?
-  rows_per_page_options: [10, 25, 50, 'All'],
-
-  # Would you even like to have a rows_per_page select box?
-  show_rows_per_page_select: (rows.size > 10),
-
-  # Would you even like pagination?
-  # We won't actually paginate if there are less than params[:rows_per_page]
-  #   rows.
-  paginate: true,
-  
-  # Do you want to be able to click on rows to expand them and show hidden
-  #   content?†
-  # If so, point us to the partial you would like to render in the detail row.
-  # This will be whatever you'd pass to `render partial: ...`
-  full_row_select_partial: nil,
-}
+actions: { "Link text" => path }
 ```
 
-###* Using group actions
+### member_actions
+
+Member Actions appear as links in the row with the model in the last `<td>`.
+These should be used for object-specific actions, such as edit or delete.
+
+Simple actions can be formatted similarly to the `actions` option above:
+
+```ruby
+member_actions: { "edit" => :edit }
+```
+
+Which will render a link to `edit_model_path`.
+
+You can also pass a block as the value for more complicated actions:
+
+```ruby
+member_actions: { "complicated" => block_of_code }
+
+def block_of_code(member)
+  # Return a URL
+end
+```
+
+By default there are no member_actions.
+
+### group_actions
 
 Group actions are a little different than the other options. They require a
 method on the `update_multiple_controller` (this option defaults to the
@@ -118,16 +114,93 @@ def update_multiple
 end
 ```
 
-###<sup>†</sup> Full Row Select
+You can set a custom update multiple controller:
+
+```ruby
+update_multiple_controller: UpdateMultipleController
+```
+
+The format for group_actions is:
+
+```ruby
+group_actions: [:delete, :approve, :etc]
+```
+
+### Pagination
+
+Pagination currently requires the kaminari gem.
+
+You can turn off pagination entirely if you would like:
+
+```ruby
+paginate: false
+```
+
+Otherwise, there are several options to customize pagination.
+
+#### rows_per_page_options
+
+Specify the collection of options for the number of rows to show on a single
+page.
+
+The format is (this is also the default setting):
+
+```ruby
+rows_per_page_options: [10, 25, 50, 'All']
+```
+
+Where 'All' is the only valid non-numeric option and works as expected.
+
+#### show_rows_per_page
+
+The rows per page setting will only appear when the number of displayed rows
+is less than or equal to ten.
+
+TODO: Make this less than the lowest option in `rows_per_page_options`
+
+You can specify that you do not want one at all:
+
+```ruby
+show_rows_per_page_select: false
+```
+
+### Full Row Select
+  
+  # Do you want to be able to click on rows to expand them and show hidden
+  #   content?†
+  # If so, point us to the partial you would like to render in the detail row.
+  # This will be whatever you'd pass to `render partial: ...`
+}
+```
+
+
+
+### Full Row Select
+
+Do you want to be able to click on rows to expand them and show hidden content?
 
 Using [calebthompson](https://github.com/calebthompson)'s
 [full-row-select](https://github.com/calebthompson/full-row-select) (which
-you'll have to download and install seperately), we can allow users to click on
-a row in the fancy_table and have it expand to show a detail row.
+you'll have to download and install seperately), you can allow users to click on
+a row in the fancy_table and have it expand to show a 'detail row'.
 
 Demos are often better than words, so go over
 [here](http://www.jankoatwarpspeed.com/examples/expandable-rows/)
 if you don't understand.
+
+To use full row select, tell fancy_table which partial to render:
+
+```ruby
+full_row_select_partial: inline_post
+```
+
+The partial will be rendered in a `<tr>` after the parent `<tr>`, and the detail
+`<tr>` will be hidden by the full-row-select JavaScript.
+
+The fancy_table will be given the `.collapsible` class of
+`full_row_select_partial` is specified. You will need to style this seperately
+if you want any sort of indicator for expandible tables (such as a ▶/▼ toggle)
+or to preserve alternating background row colors.
 
 I don't like how it looks.
 --------------------------
