@@ -202,6 +202,7 @@ The partial will be rendered in a `<tr>` after the parent `<tr>`, and the detail
 <tr>
   <!-- Colspan is the total number of columns -->
   <td colspan=5>
+    <!-- http://en.wikipedia.org/wiki/Shindig_(Firefly) -->
     <p>
       "Shindig" is the fourth episode of the science fiction television series
       Firefly created by Joss Whedon.
