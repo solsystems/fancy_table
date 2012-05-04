@@ -1,17 +1,40 @@
+:coffeescript
+  (($) ->
+    $.fn.jExpand = ->
+      element = this
+      $(element).find("tbody tr:even").addClass("collapsed")
+      $(element).find("tbody tr:not(.collapsed)").hide()
+      $(element).find("tbody tr:first-child").show()
+      $(element).find("tbody tr.collapsed").click ->
+        $(this).toggleClass("uncollapsed")
+        $(this).next("tbody tr").toggle()
+      $(element).find("tbody tr a").click (e) -> e.stopPropagation()
+  )(jQuery)
+
+  $ ->
+    $('table.fancy_table.collapsible').jExpand()
 :ruby
+  throw "objects is required" unless defined? objects
+  klass = objects.first.class
+  headers ||= objects.fancy_table_headers
+
+
+  title ||= klass.to_s.titleize.pluralize
+
   group_actions ||= []
   member_actions ||= {}
   actions ||= {}
+  collapsible ||= false
   update_multiple_controller ||= controller.controller_name
 
-  forkaminari ||= nil
-  if forkaminari.nil?
-    if objects.is_a? Draper::DecoratedEnumerableProxy
-      forkaminari = objects.instance_variable_get(:@wrapped_collection)
-    else
-      forkaminari = objects
+  forkaminari ||=
+    begin
+      if defined?(Draper) && objects.is_a?(Draper::DecoratedEnumerableProxy)
+        objects.instance_variable_get(:@wrapped_collection)
+      else
+        objects
+      end
     end
-  end
   objects = objects.to_a #only do sql once
 
   params[:order_by] =~ /\A([^\s]+)(\s*desc)?\Z/
@@ -27,7 +50,7 @@
     member_actions = member_actions.map_hash { |action| [ action, action ] }
   end
 
-  column_count = orders.count
+  column_count = headers.count
   column_count += 1 if group_actions.present?
   column_count += 1 if member_actions.present?
 
@@ -39,11 +62,11 @@
     %div
       - %w(order_by rows_per_page page).each do |param|
         %input{ type: 'hidden', value: param, name: params[param.to_sym] }
-  %table.fancy_table
+  %table.fancy_table{class: ('collapsible' if collapsible)}
     %caption
       %h2= title
       - if actions.present?
-        .controls
+        .fancy_table_actions
           - actions.each do |text, target|
             = link_to text, target
           - if show_rows_per_page
@@ -75,35 +98,26 @@
               url =
                 url_for rows_per_page: params[:rows_per_page], order_by: order
               name += ' ' + ( sort_desc ? '▼' : '▲' ) if (sort_col == field)
+            = link_to name.titleize, url, :class => sort_col == field ? 'current' : nil
         - if member_actions.present? # Empty header column for member_actions
           %th
-      - if group_actions.present? || forkaminari.respond_to?(:num_pages) || forkaminari.num_pages == 1
-        - if forkaminari.respond_to?(:current_page) || group_actions.any?
-          %tfoot
-            - if forkaminari.respond_to? :current_page
-              %tr
-                %td{ colspan: column_count }= paginate forkaminari
-            - if group_actions.any?
-              %tr#actions
-                %td{ colspan: column_count }
-                  - group_actions.each do |action|
-                    = submit_tag action, id: "#{ action.underscore }_button"
       %tbody
         - objects.each do |object|
           %tr
             - if group_actions.present?
               %td= check_box_tag "#{object.class.table_name.singularize}_ids[]", object.id
-            - orders.each do |field, name|
+            - headers.each do |field, name|
               %td
-                - if (field.to_s == object.class.default_order_column and (link = object.to_s))
-                  = link
+                :ruby
+                  value = object.send(field)
+                - if (object.class.respond_to?(:default_order_column) && field.to_s == object.class.default_order_column)
+                  = link_to_object object
                 - else
-
                   :ruby
                     #field = field.to_s # allow symbols
                     # handle calling methods on fields
                     fields = field.split('.')
-                    puts fields.inject(object) { |memo, field|
+                    value = fields.inject(object) { |memo, field|
                       if memo.nil?
                         nil
                       else
@@ -124,6 +138,7 @@
                         end
                       end
                     }
+                  = link_to_object value
             - unless member_actions.blank?
               %td
                 - member_actions.each do |text, action|
@@ -133,3 +148,18 @@
                     - klass = object.class.table_name.singularize
                     - href = send( "#{action}_#{klass}_path", object )
                   = link_to text, href
+          - if collapsible
+            %tr
+              %td{:colspan => headers.size}
+                = render object
+      - if group_actions.present? || forkaminari.respond_to?(:num_pages) && forkaminari.num_pages != 1
+        - if forkaminari.respond_to?(:current_page) || group_actions.any?
+          %tfoot
+            - if forkaminari.respond_to? :current_page
+              %tr
+                %td{ colspan: column_count }= paginate forkaminari
+            - if group_actions.any?
+              %tr#actions
+                %td{ colspan: column_count }
+                  - group_actions.each do |action|
+                    = submit_tag action, id: "#{ action.underscore }_button"
