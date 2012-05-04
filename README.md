@@ -164,6 +164,7 @@ You can specify that you do not want one at all:
 show_rows_per_page_select: false
 ```
 
+
 ### Full Row Select
 
 Do you want to be able to click on rows to expand them and show hidden content?
@@ -185,6 +186,35 @@ full_row_select_partial: inline_post
 
 The partial will be rendered in a `<tr>` after the parent `<tr>`, and the detail
 `<tr>` will be hidden by the full-row-select JavaScript.
+
+```html
+<tr>
+  <td>Shindig</td>
+  <td>Verne Gillum</td>
+  <td>Jane Espenson</td>
+  <td>November 1, 2002</td>
+  <td><a href="/firefly_episodes/4/edit">edit</td>
+</tr>
+<!--
+  The next row will be hidden by the FullRowSelect javascript.
+  Its visiblility will be toggled by clicking on the parent row, above.
+-->
+<tr>
+  <!-- Colspan is the total number of columns -->
+  <td colspan=5>
+    <p>
+      "Shindig" is the fourth episode of the science fiction television series
+      Firefly created by Joss Whedon.
+    </p>
+    <p>
+      Inara attends a formal society dance, only to find Malcolm there as well,
+      attempting to set up a smuggling job. Mal comes to blows with Inara's
+      conceited date and finds himself facing a duel with a renowned swordsman,
+      and only one night to learn how to fence.
+    </p>
+  </td>
+</tr>
+```
 
 The fancy_table will be given the `.collapsible` class of
 `full_row_select_partial` is specified. You will need to style this seperately
