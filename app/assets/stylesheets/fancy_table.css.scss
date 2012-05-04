@@ -1,0 +1,107 @@
+table.fancy_table {
+  border-collapse:collapse;
+  width:100%;
+  caption {
+    background-color: #444444;
+    text-align: left;
+    position: relative;
+    h2 {
+      color: white;
+      padding: 5px;
+    }
+    .fancy_table_actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 3px;
+      > a {
+        display: inline-block;
+        padding: 3px;
+        background-color: #ccc;
+        border: thin solid black;
+      }
+    }
+  }
+  th, th a {
+    font-weight: bold;
+    color: white;
+    background-color: #444444;
+  }
+  td, th {
+    padding: 5px;
+    vertical-align: middle;
+  }
+  td {
+    border-right : #e0e0e0 solid 1px;
+    text-align: right;
+    &:first-child {
+      text-align: left;
+    }
+    &:last-child {
+      border-right: none;
+    }
+  }
+  tr:nth-child(2n) {
+    background-color: #EEE;
+  }
+
+  &.collapsible tbody tr {
+    &:nth-child(2n) {
+      background-color: #CCCCCC;
+    }
+    //
+    &:nth-child(2n+1) {
+      background-color: white;
+    }
+    &:nth-child(4n+1) {
+      background-color: #EEEEEE;
+    }
+    &.collapsed {
+      display: table-row;
+      padding-right: inherit;
+      background-image:none;
+    }
+
+    &.collapsed {
+      > td {
+        background-position: right center;
+        background-repeat: no-repeat;
+        &:last-child {
+          background-image: image-url('bg_darkrightarrow.png');
+          // Space for collapsed/uncollapsed arrow
+          padding-right: 2em;
+        }
+      }
+      &.uncollapsed > td:last-child {
+        background-image: image-url('bg_darkdroparrow.png');
+      }
+    }
+  }
+  tfoot > tr {
+    &:first-child {
+      clear: both;
+      padding: 10px 15px;
+      border-top: solid 1px #eee;
+      border-bottom: none;
+      -webkit-border-radius: 0 0 5px 5px;
+      -moz-border-radius: 0 0 5px 5px;
+      border-radius: 0 0 5px 5px;
+      background: url(/assets/bg_contentfooter.png) repeat-x top;
+    }
+    &:not(:first-child) {
+      background: none;
+    }
+    &#actions {
+      display: table-row;
+      td {
+        text-align: center;
+        margin: inherit auto;
+      }
+    }
+  }
+
+  nav.pagination {
+    text-align:center;
+  }
+}
+
