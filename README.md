@@ -3,10 +3,17 @@ fancy_table
 
 Tables. Done right.
 
+BOOM!
+-----
+
+```erb
+<%= fancy_table @firefly_episodes %>
+```
+
 ![fancy_table of Firefly episodes](https://github.com/calebthompson/fancy_table/raw/master/firefly-episodes.png)
 
-What's going on here?
----------------------
+Okay, you've piqued my interest. What's going on here?
+-------------------------------------------
 
 fancy_table allows you to easily turn an ActiveRecord::Relation into a semantic
 HTML5 table which supports sorting, pagination, and links for actions to be
@@ -27,32 +34,22 @@ calls.
 
 ```ruby
 def index
-  @users = User.all
-  @headers = {
-    # This one's an instance method on User
-    full_name: 'Name',
-    # This one's a column on the User table
-    created_on: 'Since',
-    # Also a column. You can pass either a string or a symbol. We're not picky.
-    'age' => 'Age',
-    # This one's a method on a relation (User has_many :posts)
-    'posts.count' => 'Number of Posts',
-  }
+  @firefly_episodes = FireflyEpisode.scoped
+  @firefly_episodes = build_fancy_table @firefly_episodes
 end
 ```
 
 ### _Then in a view:_
 
 ```haml
-%section#user-index-page
-  = fancy_table 'All my Users', @users, @headers
+= fancy_table @firefly_episodes
 ```  
 
 What if I want to do...
 -----------------------
 
 We've probably got you covered. Let's take a look at the optional arguments for
-`build_fancy_table` and their default values.
+`build_fancy_table` in the controller, and their default values.
 
 ### actions
 
@@ -126,81 +123,12 @@ The format for group_actions is:
 group_actions: [:delete, :approve, :etc]
 ```
 
-### Pagination
+### limit
 
-Pagination currently requires the kaminari gem.
+The number of rows to show on the fancy_table at a time. Pagination will be
+added to the `<footer>` if neccessary.
 
-You can turn off pagination entirely if you would like:
-
-```ruby
-paginate: false
-```
-
-Otherwise, there are several options to customize pagination.
-
-#### rows_per_page_options
-
-Specify the collection of options for the number of rows to show on a single
-page.
-
-The format is (this is also the default setting):
-
-```ruby
-rows_per_page_options: [10, 25, 50, 'All']
-```
-
-Where 'All' is the only valid non-numeric option and works as expected.
-
-#### show_rows_per_page
-
-The rows per page setting will only appear when the number of displayed rows
-is less than or equal to ten.
-
-TODO: Make this less than the lowest option in `rows_per_page_options`
-
-You can specify that you do not want one at all:
-
-```ruby
-show_rows_per_page_select: false
-```
-
-### Full Row Select
-  
-  # Do you want to be able to click on rows to expand them and show hidden
-  #   content?†
-  # If so, point us to the partial you would like to render in the detail row.
-  # This will be whatever you'd pass to `render partial: ...`
-}
-```
-
-
-
-### Full Row Select
-
-Do you want to be able to click on rows to expand them and show hidden content?
-
-Using [calebthompson](https://github.com/calebthompson)'s
-[full-row-select](https://github.com/calebthompson/full-row-select) (which
-you'll have to download and install seperately), you can allow users to click on
-a row in the fancy_table and have it expand to show a 'detail row'.
-
-Demos are often better than words, so go over
-[here](http://www.jankoatwarpspeed.com/examples/expandable-rows/)
-if you don't understand.
-
-To use full row select, tell fancy_table which partial to render:
-
-```ruby
-full_row_select_partial: inline_post
-```
-
-The partial will be rendered in a `<tr>` after the parent `<tr>`, and the detail
-`<tr>` will be hidden by the full-row-select JavaScript.
-
-The fancy_table will be given the `.collapsible` class of
-`full_row_select_partial` is specified. You will need to style this seperately
-if you want any sort of indicator for expandible tables (such as a ▶/▼ toggle)
-or to preserve alternating background row colors.
+Pagination magic provided by [kaminari](https://github.com/amatsuda/kaminari)
 
 I don't like how it looks.
 --------------------------
@@ -210,6 +138,11 @@ Sticks and stones, friend.
 While we've included styles for fancy_table, we encourage you to roll your own
 that match your site. It will probably turn out better for you in the long run
 if you design your own look‐and‐feel.
+
+We customized the styles for fancy_table for our own site. Here is what the
+previous table would look like for us:
+
+![fancy_table of Firefly episodes](https://github.com/calebthompson/fancy_table/raw/master/firefly-episodes.png)
 
 SmartOrder
 ----------

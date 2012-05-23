@@ -118,7 +118,7 @@
                     # handle calling methods on fields
                     fields = field.split('.')
                     value = fields.inject(object) { |memo, field|
-                      if memo.nil?
+                      if memo.nil?#
                         nil
                       else
                         if field.match /^(.*)=(.*)$/
@@ -139,14 +139,14 @@
                       end
                     }
                   = link_to_object value
-            - unless member_actions.blank?
+            - if member_actions.present?
               %td
                 - member_actions.each do |text, action|
                   - if action.is_a? Proc
                     - href = action.call( object )
                   - else
                     - klass = object.class.table_name.singularize
-                    - href = send( "#{action}_#{klass}_path", object )
+                    - href = send(action == :show ? "#{ klass }_path" : "#{action}_#{klass}_path", object)
                   = link_to text, href
           - if collapsible
             %tr
@@ -159,7 +159,7 @@
               %tr
                 %td{ colspan: column_count }= paginate forkaminari
             - if group_actions.any?
-              %tr#actions
+              %tr.actions
                 %td{ colspan: column_count }
                   - group_actions.each do |action|
                     = submit_tag action, id: "#{ action.underscore }_button"
