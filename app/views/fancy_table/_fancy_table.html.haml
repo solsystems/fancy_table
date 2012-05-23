@@ -47,7 +47,7 @@
 
   # note that we're assuming that member_actions is going to be a hash otherwise
   if member_actions.is_a? Array
-    member_actions = member_actions.map_hash { |action| [ action, action ] }
+    member_actions = member_actions.map_hash { |action| [ action, action.to_sym ] }
   end
 
   column_count = headers.count
