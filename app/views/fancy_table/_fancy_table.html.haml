@@ -141,12 +141,13 @@
                   = link_to_object value
             - if member_actions.present?
               %td
-                - member_actions.each do |text, action|
-                  - if action.is_a? Proc
-                    - href = action.call( object )
-                  - else
-                    - klass = object.class.table_name.singularize
-                    - href = send(action == :show ? "#{ klass }_path" : "#{action}_#{klass}_path", object)
+                :ruby
+                  member_actions.each do |text, action|
+                    if action.is_a? Proc
+                      href = action.call( object )
+                    else
+                      klass = object.class.table_name.singularize
+                      href = send(action == :show ? "#{ klass }_path" : "#{action}_#{klass}_path", object)
                   = link_to text, href
           - if collapsible
             %tr
