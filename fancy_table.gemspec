@@ -21,4 +21,8 @@ Gem::Specification.new do |s|
   s.add_dependency 'squeel'
   s.add_dependency 'haml'
   s.add_dependency 'kaminari'
+  s.add_dependency 'rails'
+  s.add_dependency 'sass-rails'
+  s.add_dependency 'coffee-filter'
+
 end
