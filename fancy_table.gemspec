@@ -6,17 +6,17 @@ Gem::Specification.new do |s|
   s.name        = "fancy_table"
   s.version     = FancyTable::VERSION
   s.authors     = ["Caleb Thompson", "Ram Dobson", "Sol Systems"]
-  s.email       = ["cjaysson@gmail.com", "fringd@gmail.com", "gems@solsystemscompany.com"]
-  s.homepage    = ""
+  s.email       = %w{cjaysson@gmail.com fringd@gmail.com gems@solsystemscompany.com}
   s.summary     = %q{Tables. Done right.}
-  s.description = %q{Create fancy tables which are semantic HTML5, are easy to style, and are beautiful.}
+  s.description = <<-DESC.gsub(/\s{2,}/, '')
+                    Create fancy tables which are semantic HTML5, are easy to
+                    style, and are beautiful.
+                  DESC
 
   s.rubyforge_project = "fancy_table"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ["lib"]
+  s.files         = Dir["lib/**/*"]
+  s.require_path  = "lib"
 
   s.add_dependency 'squeel'
   s.add_dependency 'haml'
