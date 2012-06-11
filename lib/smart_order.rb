@@ -1,6 +1,8 @@
 class ActiveRecord::Base
-  def self.smart_order(order)
-    key, desc = order.sub(/( desc)$/i,''), !!$1
+  def self.smart_order(order, desc = nil)
+    # capture the sort column and whether sorting should be reversed (descending)
+    key, inline_desc = order.sub(/( desc)$/i,''), !!$1
+    desc = inline_desc if desc.nil?
     last_class = self
     joins = []
     conditions = []
