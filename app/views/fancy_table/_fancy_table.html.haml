@@ -142,8 +142,7 @@
             - if member_actions.present?
               %td
                 :ruby
-                  klass = object.class
-                  object_name = klass.table_name.singularize
+                  object_name = object.class.table_name.singularize
                 - member_actions.each do |text, action|
                   :ruby
                     href =
