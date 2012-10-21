@@ -1,0 +1,33 @@
+<%= form_for(@episode) do |f| %>
+  <% if @episode.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@episode.errors.count, "error") %> prohibited this episode from being saved:</h2>
+
+      <ul>
+      <% @episode.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :title %><br />
+    <%= f.text_field :title %>
+  </div>
+  <div class="field">
+    <%= f.label :director %><br />
+    <%= f.text_field :director %>
+  </div>
+  <div class="field">
+    <%= f.label :writer %><br />
+    <%= f.text_field :writer %>
+  </div>
+  <div class="field">
+    <%= f.label :original_air_date %><br />
+    <%= f.date_select :original_air_date %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>
