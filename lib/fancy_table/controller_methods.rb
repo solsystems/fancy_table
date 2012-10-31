@@ -7,7 +7,7 @@ class ActionController::Base
     headers = options[:headers] ||
       begin
         names = klass.column_names - %w{id created_at updated_at}
-        names.map {|name| name.sub /_id$/, '' }.map_hash{ |name| [name, name.titleize] }
+        names.map { |name| name.sub(/_id$/, '') }.map_hash{ |name| [name, name.titleize] }
       end
 
     objects.define_singleton_method(:fancy_table_headers) { headers }
@@ -16,14 +16,13 @@ class ActionController::Base
       objects=objects.smart_order order
     end
 
-    page = options[:page] || params[:page].to_i
+    page = options[:page] || params[:page]
     limit = options[:limit]
     if limit || page
       page ||= 1
-      objects = objects.page(page)
+      objects = objects.page(page.to_i)
       objects = objects.per(limit) if limit
     end
-
 
     objects
   end

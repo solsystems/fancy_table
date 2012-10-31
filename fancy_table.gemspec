@@ -18,11 +18,16 @@ Gem::Specification.new do |s|
   s.files         = Dir["lib/**/*"]
   s.require_path  = "lib"
 
-  s.add_dependency 'squeel'
+  s.add_dependency 'coffee-filter'
   s.add_dependency 'haml'
   s.add_dependency 'kaminari'
   s.add_dependency 'rails'
   s.add_dependency 'sass-rails'
-  s.add_dependency 'coffee-filter'
+  s.add_dependency 'squeel'
 
+  s.add_development_dependency 'cucumber-rails'
+  s.add_development_dependency 'database_cleaner'
+  s.add_development_dependency 'factory_girl_rails'
+  s.add_development_dependency 'rspec-rails'
+  s.add_development_dependency 'sqlite3'
 end
