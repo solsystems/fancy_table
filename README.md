@@ -10,7 +10,7 @@ BOOM!
 <%= fancy_table @firefly_episodes %>
 ```
 
-![fancy_table of Firefly episodes](https://github.com/calebthompson/fancy_table/raw/master/firefly-episodes.png)
+![fancy_table of Firefly episodes](https://github.com/solsystems/fancy_table/raw/master/firefly-episodes.png)
 
 Okay, you've piqued my interest. What's going on here?
 -------------------------------------------
